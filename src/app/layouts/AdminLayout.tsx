@@ -51,7 +51,15 @@ export const AdminLayout: React.FC = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [useremail, setUseremail] = useState('');
 
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('user');
+    const storedEmail = localStorage.getItem('email');
+    if (storedName) setUsername(storedName);
+    if (storedEmail) setUseremail(storedEmail);
+  }, []);
   const isSuperAdmin = user?.role === 'super-admin';
 
   const handleLogout = () => {
@@ -62,6 +70,7 @@ export const AdminLayout: React.FC = () => {
   const filteredNavItems = navigationItems.filter(
     item => !item.superAdminOnly || isSuperAdmin
   );
+  
 
   return (
     <div className="min-h-screen bg-[#E4EEF0]">
@@ -122,18 +131,18 @@ export const AdminLayout: React.FC = () => {
                 >
                   <div className="h-8 w-8 bg-[#075056] rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold">
-                      {user?.name?.charAt(0).toUpperCase()}
+                      {user?.name?.charAt(0).toUpperCase() ?? username.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="hidden md:block">{user?.name}</span>
+                  <span className="hidden md:block">{user?.name ?? username}</span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
 
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     <div className="px-4 py-2 border-b border-gray-200">
-                      <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <p className="text-sm font-semibold text-gray-900">{user?.name ?? username}</p>
+                      <p className="text-xs text-gray-500">{user?.email ?? useremail}</p>
                     </div>
                     <button
                       onClick={handleLogout}

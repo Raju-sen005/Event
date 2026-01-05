@@ -1,39 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Button } from '../../components/ui/button';
 import { Search, Filter, Eye, Gavel, DollarSign } from 'lucide-react';
 
-export const BidsList: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+interface Bid {
+  id: number;
+  vendorName: string;
+  requirementTitle: string;
+  customerName: string;
+  amount: number;
+  status: "Pending" | "Approved" | "Rejected";
+  createdAt: string;
+  vendor: string;
+  requirement: string;
+  customer: string;
+}
 
-  const bids = [
-    {
-      id: '1',
-      vendor: 'Royal Caterers',
-      requirement: 'Wedding Catering Service',
-      customer: 'Priya Sharma',
-      amount: '₹4,75,000',
-      submittedDate: '2024-03-11',
-      status: 'Pending'
-    },
-    {
-      id: '2',
-      vendor: 'Dream Venues',
-      requirement: 'Venue Booking',
-      customer: 'Rahul Mehta',
-      amount: '₹8,50,000',
-      submittedDate: '2024-03-12',
-      status: 'Accepted'
-    },
-    {
-      id: '3',
-      vendor: 'Elegant Decor',
-      requirement: 'Event Decoration',
-      customer: 'Ananya Gupta',
-      amount: '₹1,25,000',
-      submittedDate: '2024-03-09',
-      status: 'Rejected'
-    },
-  ];
+export const BidsList: React.FC = () => {
+  const [bids, setBids] = useState<Bid[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [stats, setStats] = useState({
+    total: 0,
+    approved: 0,
+    pending: 0,
+  });
+
+  /* =========================
+     FETCH BIDS + STATS
+  ========================= */
+  useEffect(() => {
+    fetchBids();
+    // fetchBidStats();
+  }, []);
+
+  const fetchBids = async () => {
+    const res = await axios.get("http://localhost:5000/api/bids");
+    setBids(res.data.bids);
+  };
+
+  // const fetchBidStats = async () => {
+  //   const res = await axios.get("http://localhost:5000/api/bids/stats");
+  //   setStats({
+  //     total: res.data.stats.total,
+  //     approved: res.data.stats.approved,
+  //     pending: res.data.stats.pending,
+  //   });
+  // };
+
+  const filteredBids = bids.filter(
+    (bid) =>
+      bid.vendorName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bid.requirementTitle?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -50,7 +68,7 @@ export const BidsList: React.FC = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <p className="text-sm text-gray-600 mb-1">Accepted Bids</p>
           <p className="text-3xl font-bold text-green-600">
-            {bids.filter(b => b.status === 'Accepted').length}
+            {bids.filter(b => b.status === 'Approved').length}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -110,11 +128,10 @@ export const BidsList: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    bid.status === 'Accepted' ? 'bg-green-100 text-green-700' :
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${bid.status === 'Approved' ? 'bg-green-100 text-green-700' :
                     bid.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                    'bg-yellow-100 text-yellow-700'
-                  }`}>
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>
                     {bid.status}
                   </span>
                 </td>

@@ -33,6 +33,7 @@ export const AdminDashboard: React.FC = () => {
   totalVendors: 0,
   activeEvents: 0,
   totalRequirements: 0,
+  totalBids: 0,
 });
 
 useEffect(() => {
@@ -95,7 +96,7 @@ useEffect(() => {
     },
     {
       label: 'Bids Submitted',
-      value: '542',
+      value: stats.totalBids,
       change: '+18%',
       trend: 'up',
       icon: Gavel,

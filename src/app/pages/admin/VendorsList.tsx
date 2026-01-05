@@ -19,112 +19,47 @@ interface Vendor {
 
 export const VendorsList: React.FC = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-const [stats, setStats] = useState({
-  total: 0,
-  verified: 0,
-  pending: 0,
-  suspended: 0,
-});
+  const [stats, setStats] = useState({
+    total: 0,
+    verified: 0,
+    pending: 0,
+    suspended: 0,
+  });
 
-const [searchQuery, setSearchQuery] = useState("");
-const [filterStatus, setFilterStatus] =
-  useState<"all" | "verified" | "pending" | "suspended">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] =
+    useState<"all" | "verified" | "pending" | "suspended">("all");
 
-useEffect(() => {
-  fetchVendors();
-}, [searchQuery, filterStatus]);
+  useEffect(() => {
+    fetchVendors();
+  }, [searchQuery, filterStatus]);
 
-const fetchVendors = async () => {
-  const res = await axios.get(
-    "http://localhost:5000/api/admin/vendors",
-    {
-      params: {
-        search: searchQuery,
-        status: filterStatus,
-      },
-    }
-  );
+  const fetchVendors = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/api/admin/vendors",
+      {
+        params: {
+          search: searchQuery,
+          status: filterStatus,
+        },
+      }
+    );
 
-  setVendors(res.data.vendors);
-  setStats(res.data.stats);
-};
+    setVendors(res.data.vendors);
+    setStats(res.data.stats);
+  };
 
   const navigate = useNavigate();
-  // const [searchQuery, setSearchQuery] = useState('');
-  // const [filterStatus, setFilterStatus] = useState<'all' | 'verified' | 'pending' | 'suspended'>('all');
 
-  // const vendors: Vendor[] = [
-  //   {
-  //     id: '1',
-  //     name: 'Royal Caterers',
-  //     email: 'contact@royalcaterers.com',
-  //     phone: '+91 98765 11111',
-  //     service: 'Catering',
-  //     joinedDate: '2023-11-10',
-  //     status: 'verified',
-  //     rating: 4.8,
-  //     completedJobs: 45
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Dream Venues',
-  //     email: 'info@dreamvenues.com',
-  //     phone: '+91 98765 22222',
-  //     service: 'Venue',
-  //     joinedDate: '2023-10-15',
-  //     status: 'verified',
-  //     rating: 4.9,
-  //     completedJobs: 67
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Elegant Decor',
-  //     email: 'hello@elegantdecor.com',
-  //     phone: '+91 98765 33333',
-  //     service: 'Decoration',
-  //     joinedDate: '2024-01-05',
-  //     status: 'verified',
-  //     rating: 4.7,
-  //     completedJobs: 34
-  //   },
-  //   {
-  //     id: '4',
-  //     name: 'Melody Makers',
-  //     email: 'contact@melodymakers.com',
-  //     phone: '+91 98765 44444',
-  //     service: 'Entertainment',
-  //     joinedDate: '2024-02-20',
-  //     status: 'pending',
-  //     rating: 0,
-  //     completedJobs: 0
-  //   },
-  //   {
-  //     id: '5',
-  //     name: 'Flash Photography',
-  //     email: 'info@flashphoto.com',
-  //     phone: '+91 98765 55555',
-  //     service: 'Photography',
-  //     joinedDate: '2023-09-12',
-  //     status: 'suspended',
-  //     rating: 4.2,
-  //     completedJobs: 23
-  //   },
-  // ];
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         vendor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         vendor.service.toLowerCase().includes(searchQuery.toLowerCase());
+      vendor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vendor.service.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterStatus === 'all' || vendor.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
-  // const stats = {
-  //   total: vendors.length,
-  //   verified: vendors.filter(v => v.status === 'verified').length,
-  //   pending: vendors.filter(v => v.status === 'pending').length,
-  //   suspended: vendors.filter(v => v.status === 'suspended').length,
-  // };
 
   return (
     <div className="space-y-6">
@@ -187,7 +122,7 @@ const fetchVendors = async () => {
           {/* Export */}
           <Button variant="outline" className="flex items-center gap-2">
             <Download className="h-4 w-4" />
-            Export
+            Import
           </Button>
         </div>
       </div>

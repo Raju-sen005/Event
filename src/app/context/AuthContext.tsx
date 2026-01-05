@@ -107,6 +107,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const demoLogin = (role: UserRole) => {
+    localStorage.setItem('user', `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`);
+    localStorage.setItem('email', `demo-${role}@eventmanager.com`);
     setIsDemo(true);
     setUser({
       id: 'demo',
