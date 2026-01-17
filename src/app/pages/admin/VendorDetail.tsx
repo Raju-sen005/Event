@@ -17,57 +17,141 @@ import {
   Download,
   AlertCircle
 } from 'lucide-react';
+import axios from "axios";
+import { useEffect } from "react";
+
+interface Vendor {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  category: string;
+  joinedDate: string;
+  status: "verified" | "pending" | "suspended";
+  location: string;
+  rating: number;
+  completedJobs: number;
+  activeJobs: number;
+  totalRevenue: number;
+  description: string;
+}
+
+interface Document {
+  name: string;
+  verified: boolean;
+  url: string;
+  status:string;
+}
+
+interface Job {
+  id: string;
+  event: string;
+  customer: string;
+  amount: number;
+  status: string;
+  date: string;
+}
+
+interface Review {
+  customer: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
 
 export const VendorDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showActionModal, setShowActionModal] = useState<'verify' | 'suspend' | null>(null);
 
+
+const [vendor, setVendor] = useState<Vendor | null>(null);
+const [documents, setDocuments] = useState<Document[]>([]);
+const [recentJobs, setRecentJobs] = useState<Job[]>([]);
+const [reviews, setReviews] = useState<Review[]>([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  fetchVendorDetail();
+}, [id]);
+
+const fetchVendorDetail = async () => {
+  try {
+    const res = await axios.get(
+      `http://localhost:5000/api/admin/vendors/${id}`
+    );
+
+    setVendor(res.data.vendor);
+    setDocuments(res.data.vendor.documents || []);
+    setRecentJobs(res.data.vendor.recentJobs || []);
+    setReviews(res.data.vendor.reviews || []);
+  } catch (error) {
+    console.error("Failed to fetch vendor details");
+  } finally {
+    setLoading(false);
+  }
+};
+
+if (loading) {
+  return <p className="text-center py-10">Loading vendor details...</p>;
+}
+
+if (!vendor) {
+  return <p className="text-center py-10 text-red-500">Vendor not found</p>;
+}
+
   // Mock vendor data
-  const vendor = {
-    id: id || '1',
-    name: 'Royal Caterers',
-    email: 'contact@royalcaterers.com',
-    phone: '+91 98765 11111',
-    service: 'Catering',
-    joinedDate: '2023-11-10',
-    status: 'pending' as 'verified' | 'pending' | 'suspended',
-    location: 'Mumbai, Maharashtra',
-    rating: 4.8,
-    completedJobs: 45,
-    activeJobs: 8,
-    totalRevenue: '₹12,45,000',
-    description: 'Premium catering services for weddings and corporate events with 10+ years of experience.',
-  };
+  // const vendor = {
+  //   id: id || '1',
+  //   name: 'Royal Caterers',
+  //   email: 'contact@royalcaterers.com',
+  //   phone: '+91 98765 11111',
+  //   service: 'Catering',
+  //   joinedDate: '2023-11-10',
+  //   status: 'pending' as 'verified' | 'pending' | 'suspended',
+  //   location: 'Mumbai, Maharashtra',
+  //   rating: 4.8,
+  //   completedJobs: 45,
+  //   activeJobs: 8,
+  //   totalRevenue: '₹12,45,000',
+  //   description: 'Premium catering services for weddings and corporate events with 10+ years of experience.',
+  // };
 
-  const documents = [
-    { name: 'GST Certificate', status: 'Uploaded', verified: true },
-    { name: 'Business License', status: 'Uploaded', verified: true },
-    { name: 'ID Proof (Aadhar)', status: 'Uploaded', verified: false },
-    { name: 'Bank Details', status: 'Uploaded', verified: true },
-  ];
+  // const documents = [
+  //   { name: 'GST Certificate', status: 'Uploaded', verified: true },
+  //   { name: 'Business License', status: 'Uploaded', verified: true },
+  //   { name: 'ID Proof (Aadhar)', status: 'Uploaded', verified: false },
+  //   { name: 'Bank Details', status: 'Uploaded', verified: true },
+  // ];
 
-  const recentJobs = [
-    { id: '1', event: 'Wedding Reception', customer: 'Priya Sharma', amount: '₹2,50,000', status: 'Completed', date: '2024-03-15' },
-    { id: '2', event: 'Corporate Event', customer: 'TechCorp', amount: '₹1,75,000', status: 'Active', date: '2024-04-20' },
-    { id: '3', event: 'Birthday Party', customer: 'Rahul Mehta', amount: '₹85,000', status: 'Completed', date: '2024-02-28' },
-  ];
+  // const recentJobs = [
+  //   { id: '1', event: 'Wedding Reception', customer: 'Priya Sharma', amount: '₹2,50,000', status: 'Completed', date: '2024-03-15' },
+  //   { id: '2', event: 'Corporate Event', customer: 'TechCorp', amount: '₹1,75,000', status: 'Active', date: '2024-04-20' },
+  //   { id: '3', event: 'Birthday Party', customer: 'Rahul Mehta', amount: '₹85,000', status: 'Completed', date: '2024-02-28' },
+  // ];
 
-  const reviews = [
-    { customer: 'Priya Sharma', rating: 5, comment: 'Excellent service, food quality was outstanding!', date: '2024-03-16' },
-    { customer: 'Ananya Gupta', rating: 4, comment: 'Good experience, timely delivery.', date: '2024-03-01' },
-    { customer: 'Vikram Singh', rating: 5, comment: 'Highly professional and cooperative team.', date: '2024-02-15' },
-  ];
+  // const reviews = [
+  //   { customer: 'Priya Sharma', rating: 5, comment: 'Excellent service, food quality was outstanding!', date: '2024-03-16' },
+  //   { customer: 'Ananya Gupta', rating: 4, comment: 'Good experience, timely delivery.', date: '2024-03-01' },
+  //   { customer: 'Vikram Singh', rating: 5, comment: 'Highly professional and cooperative team.', date: '2024-02-15' },
+  // ];
 
-  const handleVerify = () => {
-    // Logic to verify vendor
-    setShowActionModal(null);
-  };
+  const handleVerify = async () => {
+  await axios.patch(
+    `http://localhost:5000/api/admin/vendors/${vendor.id}/verify`
+  );
+  fetchVendorDetail();
+  setShowActionModal(null);
+};
 
-  const handleSuspend = () => {
-    // Logic to suspend vendor
-    setShowActionModal(null);
-  };
+const handleSuspend = async () => {
+  await axios.patch(
+    `http://localhost:5000/api/admin/vendors/${vendor.id}/suspend`
+  );
+  fetchVendorDetail();
+  setShowActionModal(null);
+};
+
 
   return (
     <div className="space-y-6">
@@ -127,7 +211,7 @@ export const VendorDetail: React.FC = () => {
                 <h2 className="text-gray-900 mb-2">{vendor.name}</h2>
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                    {vendor.service}
+                    {vendor.category}
                   </span>
                   {vendor.status === 'verified' && (
                     <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">

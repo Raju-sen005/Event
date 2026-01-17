@@ -82,6 +82,14 @@ export const VendorProfile: React.FC = () => {
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#075056]"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#16232A] mb-2">Category</label>
+                  <input
+                    {...register('category')}
+                    defaultValue="Catering"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#075056]"
+                  />
+                </div>
               </div>
 
               <div>

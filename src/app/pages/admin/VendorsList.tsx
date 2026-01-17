@@ -10,14 +10,17 @@ interface Vendor {
   name: string;
   email: string;
   phone: string;
-  service: string;
+  category: string;
   joinedDate: string;
   status: 'verified' | 'pending' | 'suspended';
   rating: number;
-  completedJobs: number;
+  location: string;
 }
 
 export const VendorsList: React.FC = () => {
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [stats, setStats] = useState({
     total: 0,
@@ -55,11 +58,36 @@ export const VendorsList: React.FC = () => {
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vendor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.service.toLowerCase().includes(searchQuery.toLowerCase());
+      vendor.category.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterStatus === 'all' || vendor.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await axios.post(
+        "http://localhost:5000/api/admin/vendors/import",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      alert("Vendors imported successfully");
+      fetchVendors(); // refresh list
+    } catch (error) {
+      alert("Import failed");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -120,10 +148,23 @@ export const VendorsList: React.FC = () => {
           </div>
 
           {/* Export */}
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Download className="h-4 w-4" />
             Import
           </Button>
+
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={(e) => handleImport(e)}
+          />
+
         </div>
       </div>
 
@@ -137,7 +178,7 @@ export const VendorsList: React.FC = () => {
                   Vendor
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Service
+                  Category
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Contact
@@ -146,7 +187,7 @@ export const VendorsList: React.FC = () => {
                   Rating
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Jobs Completed
+                  Location
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Status
@@ -171,7 +212,7 @@ export const VendorsList: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
-                      {vendor.service}
+                      {vendor.category}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -190,7 +231,7 @@ export const VendorsList: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm font-semibold text-gray-900">
-                      {vendor.completedJobs}
+                      {vendor.location}
                     </span>
                   </td>
                   <td className="px-6 py-4">
